@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>Polygon Arrays</title>
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 100%;
+      }
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+<script>
+    //&callback=initMap
+    var xhttp = new XMLHttpRequest();
+    var my_xml;
+    var coord;
+    var array;
+    var coords;
+    var xmlDoc;
+    var DocCoordsPosi=[];
+    var finished = false;
+    var map;
+    var infoWindow;
+    var triangleCoords = [];
+    var triangleCoords_bk = [];
+    var geocoder;
+    //inicia as variáveis do google
+    function initMap() {
+        map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 7,
+          center: new google.maps.LatLng(-3.7676522562832417,-38.525962829589844),
+          mapTypeId: 'terrain'
+        });
+        geocoder = new google.maps.Geocoder;
+        start();
+    }
+
+        function start(){
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    my_xml = this;
+                    loop_AddPoly(this);
+                }
+            };
+            xhttp.open("GET", "My_xml.xml", true);
+            xhttp.send();
+        }
+
+        function loop_AddPoly() {
+            xmlDoc = my_xml.responseXML;
+            var j =0;
+            for(var i =0;i<xmlDoc.getElementsByTagName("local")[0].childNodes.length;i++){
+                if(xmlDoc.getElementsByTagName("local")[0].childNodes[i].nodeType == 1){
+                        DocCoordsPosi[j++] = i;
+                        coord = xmlDoc.getElementsByTagName("local")[0].childNodes[i].childNodes[0].nodeValue;
+                        array = JSON.parse("[" +coord+ "]");
+                        setTimeout(addPoly(),finished);
+                        finished=false;
+                        //array = [];
+                }
+            }
+            console.log(array);
+        }
+
+        function addPoly(){
+            var j=0;
+            for(var i =0;i<array.length;i++){
+                triangleCoords[j]= new google.maps.LatLng(parseFloat(array[++i].toFixed(6)), parseFloat(array[i-1].toFixed(6)));
+                j++;
+            }
+            var cearaMap = new google.maps.Polygon({
+              paths: triangleCoords,
+              strokeColor: '#FF0000',
+              strokeOpacity: 0.8,
+              strokeWeight: 3,
+              fillColor: '#FF0000',
+              fillOpacity: 0.35
+            });
+            cearaMap.setMap(map);
+
+            // Add a listener for the click event.
+            cearaMap.addListener('click', showArrays);
+
+            infoWindow = new google.maps.InfoWindow;
+            triangleCoords=[];
+            finished=true;
+        }
+
+          /** @this {google.maps.Polygon} */
+        function showArrays(event) {
+            // Since this polygon has only one path, we can call getPath() to return the
+            // MVCArray of LatLngs.
+            var vertices = this.getPath();
+            var latlng = {lat: event.latLng.lat(), lng: event.latLng.lng()};
+            var contentString;
+              geocoder.geocode({'location': latlng}, function(results, status) {
+                  if (status === google.maps.GeocoderStatus.OK) {
+                      if (results[1]) {
+                          console.log(results[5].formatted_address);
+                          contentString = '<b>'+results[6].formatted_address+'</b><br>' +
+                              'Clicked location: <br>' + event.latLng.lat() + ',' + event.latLng.lng() +
+                              '<br>';
+
+                          // Replace the info window's content and position.
+                          infoWindow.setContent(contentString);
+                          infoWindow.setPosition(event.latLng);
+
+                          infoWindow.open(map);
+                      } else {
+                          window.alert('No results found');
+                      }
+                  } else {
+                      window.alert('Geocoder failed due to: ' + status);
+                  }
+              });
+         }
+    </script>
+  </body>
+  <script
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBJtvVr9mV3pmMfcw3rnC8xQpPsiNqNS2M&callback=initMap" async defer>
+  </script>
+</html>
