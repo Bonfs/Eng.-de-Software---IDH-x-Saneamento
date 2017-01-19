@@ -444,16 +444,6 @@
     "investimentoTotalPorAno": 296114
   },
   {
-    "id" : 44,
-    "nome": "Cedro",
-    "idh": 0.627,
-    "populacao": 24527,
-    "atendimentoAgua": 0.428,
-    "coletaEsgoto": 0.037,
-    "tratamentoEsgoto": 0.096,
-    "investimentoTotalPorAno": 296114
-  },
-  {
     "id" : 45,
     "nome": "Chaval",
     "idh": 0.586,
@@ -504,16 +494,6 @@
     "investimentoTotalPorAno": 3722476
   },
   {
-    "id" : 49,
-    "nome": "Crateús",
-    "idh": 0.644,
-    "populacao": 72812,
-    "atendimentoAgua": 0.533,
-    "coletaEsgoto": 0.215,
-    "tratamentoEsgoto": 0.328,
-    "investimentoTotalPorAno": 3722476
-  },
-  {
     "id" : 50,
     "nome": "Crato",
     "idh": 0.713,
@@ -542,16 +522,6 @@
     "coletaEsgoto": null,
     "tratamentoEsgoto": null,
     "investimentoTotalPorAno": 83531
-  },
-  {
-    "id" : 53,
-    "nome": "Deputado Irapuan Pinheiro",
-    "idh": 0.609,
-    "populacao": 9095,
-    "atendimentoAgua": null,
-    "coletaEsgoto": null,
-    "tratamentoEsgoto": null,
-    "investimentoTotalPorAno": null
   },
   {
     "id" : 53,
@@ -832,16 +802,6 @@
     "coletaEsgoto": null,
     "tratamentoEsgoto": null,
     "investimentoTotalPorAno": 48065
-  },
-  {
-    "id" : 80,
-    "nome": "Ipu",
-    "idh": 0.618,
-    "populacao": 40296,
-    "atendimentoAgua": null,
-    "coletaEsgoto": null,
-    "tratamentoEsgoto": null,
-    "investimentoTotalPorAno": null
   },
   {
     "id" : 81,
