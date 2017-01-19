@@ -23,6 +23,8 @@
 <script>
     //&callback=initMap
     var xhttp = new XMLHttpRequest();
+    var jsonHttp = new XMLHttpRequest();
+    var jsonCidades;
     var my_xml;
     var coord;
     var array;
@@ -46,7 +48,23 @@
         start();
     }
 
+    //Carrega o JSON
+    function loadJSON(callback) {
+        jsonHttp.overrideMimeType("application/json");
+        jsonHttp.open('GET', 'cidades.json', true);
+        jsonHttp.onreadystatechange = function () {
+            if(jsonHttp.readyState == 4 && jsonHttp.status == '200'){
+                callback(jsonHttp.responseText);
+            }
+        }
+        jsonHttp.send(null);
+    }
+
         function start(){
+            loadJSON(function (response) {
+                jsonCidades = JSON.parse(response);
+                //console.log(jsonCidades);
+            })
             xhttp.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
                     my_xml = this;
@@ -62,18 +80,20 @@
             var j =0;
             for(var i =0;i<xmlDoc.getElementsByTagName("local")[0].childNodes.length;i++){
                 if(xmlDoc.getElementsByTagName("local")[0].childNodes[i].nodeType == 1){
-                        DocCoordsPosi[j++] = i;
+                        DocCoordsPosi[j] = i;
                         coord = xmlDoc.getElementsByTagName("local")[0].childNodes[i].childNodes[0].nodeValue;
                         array = JSON.parse("[" +coord+ "]");
-                        setTimeout(addPoly(),finished);
+                        setTimeout(addPoly(jsonCidades[j].idh),finished);
+                        j++;
                         finished=false;
                         //array = [];
                 }
             }
-            console.log(array);
+            console.log(DocCoordsPosi);
+            //console.log(array);
         }
 
-        function addPoly(){
+        function addPoly(idh){
             var j=0;
             for(var i =0;i<array.length;i++){
                 triangleCoords[j]= new google.maps.LatLng(parseFloat(array[++i].toFixed(6)), parseFloat(array[i-1].toFixed(6)));
@@ -85,7 +105,7 @@
               strokeOpacity: 0.8,
               strokeWeight: 3,
               fillColor: '#FF0000',
-              fillOpacity: 0.35
+              fillOpacity: idh
             });
             cearaMap.setMap(map);
 
