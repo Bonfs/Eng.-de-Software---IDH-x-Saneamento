@@ -7,163 +7,242 @@
     <style>
       /* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
-      #map {
-        height: 100%;
-      }
-      /* Optional: Makes the sample page fill the window. */
-      html, body {
-        height: 100%;
+      *{
         margin: 0;
         padding: 0;
+      }
+
+      #map {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: 10;
+        overflow:hidden;
+      }
+
+      #fundo {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,.6);
+        z-index: 20;
+        overflow:hidden;
+        display: none;
+      }
+
+      #caixaDeDialogo{
+        position: absolute;
+        width: 70%;
+        height: 70%;
+        left: calc(15% - 20px); 
+        top: calc(15% - 20px);
+        padding: 20px;
+        border-radius: 15px;
+        background-color: #ffffff;
+        z-index: 30;
+        display: none;
+      }
+
+      #fechar{ 
+        width:24px; 
+        position: absolute; 
+        margin-left: calc(100% - 72px);
+        z-index: 35;
+        display: none;
       }
     </style>
   </head>
   <body>
-    <div id="map"></div>
-<script>
-    //&callback=initMap
-    var xhttp = new XMLHttpRequest();
-    var jsonHttp = new XMLHttpRequest();
-    var jsonCidades;
-    var my_xml;
-    var coord;
-    var array;
-    var coords;
-    var xmlDoc;
-    var DocCoordsPosi=[];
-    var finished = false;
-    var map;
-    var infoWindow;
-    var triangleCoords = [];
-    var triangleCoords_bk = [];
-    var geocoder;
-    //inicia as variáveis do google
-    function initMap() {
-        map = new google.maps.Map(document.getElementById('map'), {
-          zoom: 7,
-          center: new google.maps.LatLng(-3.7676522562832417,-38.525962829589844),
-          mapTypeId: 'terrain'
-        });
-        geocoder = new google.maps.Geocoder;
-        start();
-    }
+    <div id="fechar" onclick="ocultarLightbox()"><img src="fechar.png" alt="fechar caixa"></div>
+    <div id="caixaDeDialogo">  
+      <ul> 
+        <li> <h1>Nome</h1> </li> 
+        <li> <h2>IDH</h2> </li> 
+      </ul>
 
-    //Carrega o JSON
-    function loadJSON(callback) {
-        jsonHttp.overrideMimeType("application/json");
-        jsonHttp.open('GET', 'cidades.json', true);
-        jsonHttp.onreadystatechange = function () {
-            if(jsonHttp.readyState == 4 && jsonHttp.status == '200'){
-                callback(jsonHttp.responseText);
-            }
-        }
-        jsonHttp.send(null);
-    }
+      <h3>Pupulação</h3> 
 
-        function start(){
-            loadJSON(function (response) {
-                jsonCidades = JSON.parse(response);
-                //console.log(jsonCidades);
-            })
-            xhttp.onreadystatechange = function() {
-                if (this.readyState == 4 && this.status == 200) {
-                    my_xml = this;
-                    loop_AddPoly(this);
-                }
-            };
-            xhttp.open("GET", "My_xml.xml", true);
-            xhttp.send();
-        }
+      <div id="atendimentoAgua"></div>
+      <div id="coletaEsgoto"></div>
+      <div id="tratamentoEsgoto"></div>
 
-        function loop_AddPoly() {
-            xmlDoc = my_xml.responseXML;
-            var j =0;
-            for(var i =0;i<xmlDoc.getElementsByTagName("local")[0].childNodes.length;i++){
-                if(xmlDoc.getElementsByTagName("local")[0].childNodes[i].nodeType == 1){
-                        DocCoordsPosi[j] = i;
+      <h3>Investimento Total Anual</h3>
+      <h3>Investimento por Individuo Anual</h3>
 
-                        coord = xmlDoc.getElementsByTagName("local")[0].childNodes[i].childNodes[0].nodeValue;
-                        array = JSON.parse("[" +coord+ "]");
-                        setTimeout(addPoly(jsonCidades[j]),finished);
-                        j++;
-                        finished=false;
-                        //array = [];
-                }
-            }
-            console.log(jsonCidades.length);
-            console.log(DocCoordsPosi.length);
-            //console.log(array);
-        }
+    </div>
 
-        function addPoly(cidade){
-            var j=0;
-            for(var i =0;i<array.length;i++){
-                triangleCoords[j]= new google.maps.LatLng(parseFloat(array[++i].toFixed(6)), parseFloat(array[i-1].toFixed(6)));
-                j++;
-            }
-            var cearaMap = new google.maps.Polygon({
-              paths: triangleCoords,
-              strokeColor: '#FF0000',
-              strokeOpacity: 0.8,
-              strokeWeight: 1,
-              fillColor: '#FF0000',
-              fillOpacity: cidade.idh
-            });
-            cearaMap.setMap(map);
+    <div id="fundo"></div>
+    <div id="map" onclick="mostrarLightbox()"></div>
+    
+    <script>
+      //&callback=initMap
+      var xhttp = new XMLHttpRequest();
+      var jsonHttp = new XMLHttpRequest();
+      var jsonCidades;
+      var my_xml;
+      var coord;
+      var array;
+      var coords;
+      var xmlDoc;
+      var DocCoordsPosi=[];
+      var finished = false;
+      var map;
+      var infoWindow;
+      var triangleCoords = [];
+      var triangleCoords_bk = [];
+      var geocoder;
+      //inicia as variáveis do google
+      function initMap() {
+          map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 7,
+            //center: new google.maps.LatLng(-3.7676522562832417,-38.525962829589844),
+            center: new google.maps.LatLng(-5.2296382,-39.495452,7),
+            mapTypeId: 'terrain'
+          });
+          geocoder = new google.maps.Geocoder;
+          start();
+      }
 
-            // Add a listener for the click event.
-            cearaMap.addListener('click', function showArrays(event) {
-            // Since this polygon has only one path, we can call getPath() to return the
-            // MVCArray of LatLngs.
-            var vertices = this.getPath();
-            var latlng = {lat: event.latLng.lat(), lng: event.latLng.lng()};
-            var contentString;
-            contentString = '<b>'+cidade.nome+'</b><br>' +
-                              'Clicked location: <br>' + event.latLng.lat() + ',' + event.latLng.lng() +
-                              '<br>';
-	        // Replace the info window's content and position.
-	        infoWindow.setContent(contentString);
-	        infoWindow.setPosition(event.latLng);
+      //Carrega o JSON
+      function loadJSON(callback) {
+          jsonHttp.overrideMimeType("application/json");
+          jsonHttp.open('GET', 'cidades.json', true);
+          jsonHttp.onreadystatechange = function () {
+              if(jsonHttp.readyState == 4 && jsonHttp.status == '200'){
+                  callback(jsonHttp.responseText);
+              }
+          }
+          jsonHttp.send(null);
+      }
 
-	        infoWindow.open(map);
-         });
-
-            infoWindow = new google.maps.InfoWindow;
-            triangleCoords=[];
-            finished=true;
-        }
-
-          /** @this {google.maps.Polygon} */
-        function showArrays(event) {
-            // Since this polygon has only one path, we can call getPath() to return the
-            // MVCArray of LatLngs.
-            var vertices = this.getPath();
-            var latlng = {lat: event.latLng.lat(), lng: event.latLng.lng()};
-            var contentString;
-              geocoder.geocode({'location': latlng}, function(results, status) {
-                  if (status === google.maps.GeocoderStatus.OK) {
-                      if (results[1]) {
-                          console.log(results[5].formatted_address);
-                          contentString = '<b>'+results[6].formatted_address+'</b><br>' +
-                              'Clicked location: <br>' + event.latLng.lat() + ',' + event.latLng.lng() +
-                              '<br>';
-
-                          // Replace the info window's content and position.
-                          infoWindow.setContent(contentString);
-                          infoWindow.setPosition(event.latLng);
-
-                          infoWindow.open(map);
-                      } else {
-                          window.alert('No results found');
-                      }
-                  } else {
-                      window.alert('Geocoder failed due to: ' + status);
+          function start(){
+              loadJSON(function (response) {
+                  jsonCidades = JSON.parse(response);
+                  //console.log(jsonCidades);
+              })
+              xhttp.onreadystatechange = function() {
+                  if (this.readyState == 4 && this.status == 200) {
+                      my_xml = this;
+                      loop_AddPoly(this);
                   }
+              };
+              xhttp.open("GET", "My_xml.xml", true);
+              xhttp.send();
+          }
+
+          function loop_AddPoly() {
+              xmlDoc = my_xml.responseXML;
+              var j =0;
+              for(var i =0;i<xmlDoc.getElementsByTagName("local")[0].childNodes.length;i++){
+                  if(xmlDoc.getElementsByTagName("local")[0].childNodes[i].nodeType == 1){
+                          DocCoordsPosi[j] = i;
+
+                          coord = xmlDoc.getElementsByTagName("local")[0].childNodes[i].childNodes[0].nodeValue;
+                          array = JSON.parse("[" +coord+ "]");
+                          setTimeout(addPoly(jsonCidades[j]),finished);
+                          j++;
+                          finished=false;
+                          //array = [];
+                  }
+              }
+              console.log(jsonCidades.length);
+              console.log(DocCoordsPosi.length);
+              //console.log(array);
+          }
+
+          function addPoly(cidade){
+              var j=0;
+              for(var i =0;i<array.length;i++){
+                  triangleCoords[j]= new google.maps.LatLng(parseFloat(array[++i].toFixed(6)), parseFloat(array[i-1].toFixed(6)));
+                  j++;
+              }
+              var cearaMap = new google.maps.Polygon({
+                paths: triangleCoords,
+                strokeColor: '#FF0000',
+                strokeOpacity: 0.8,
+                strokeWeight: 1,
+                fillColor: '#FF0000',
+                fillOpacity: cidade.idh
               });
-         }
+              cearaMap.setMap(map);
+
+              // Add a listener for the click event.
+              cearaMap.addListener('click', function(event) {
+              // Since this polygon has only one path, we can call getPath() to return the
+              // MVCArray of LatLngs.
+              var vertices = this.getPath();
+              var latlng = {lat: event.latLng.lat(), lng: event.latLng.lng()};
+              var contentString;
+              contentString = '<b>'+cidade.nome+'</b><br>' +
+                                'Clicked location: <br>' + event.latLng.lat() + ',' + event.latLng.lng() +
+                                '<br>';
+            // Replace the info window's content and position.
+            infoWindow.setContent(contentString);
+            infoWindow.setPosition(event.latLng);
+
+            infoWindow.open(map);
+           });//ate aqui
+
+              infoWindow = new google.maps.InfoWindow;
+              triangleCoords=[];
+              finished=true;
+          }
+
+            /** @this {google.maps.Polygon} */
+          function showArrays(event) {
+              // Since this polygon has only one path, we can call getPath() to return the
+              // MVCArray of LatLngs.
+              var vertices = this.getPath();
+              var latlng = {lat: event.latLng.lat(), lng: event.latLng.lng()};
+              var contentString;
+                geocoder.geocode({'location': latlng}, function(results, status) {
+                    if (status === google.maps.GeocoderStatus.OK) {
+                        if (results[1]) {
+                            console.log(results[5].formatted_address);
+                            contentString = '<b>'+results[6].formatted_address+'</b><br>' +
+                                'Clicked location: <br>' + event.latLng.lat() + ',' + event.latLng.lng() +
+                                '<br>';
+
+                            // Replace the info window's content and position.
+                            infoWindow.setContent(contentString);
+                            infoWindow.setPosition(event.latLng);
+
+                            infoWindow.open(map);
+                        } else {
+                            window.alert('No results found');
+                        }
+                    } else {
+                        window.alert('Geocoder failed due to: ' + status);
+                    }
+                });
+           }
+      
+      var status = false;
+      var fundo = document.getElementById('fundo');
+      var caixa = document.getElementById('caixaDeDialogo');
+      var fechar = document.getElementById('fechar');
+      function mostrarLightbox(){
+        status = true;
+        if(status){
+          fundo.style.display="block";
+          caixa.style.display="block";
+          fechar.style.display="block";
+        }
+      }
+
+      function ocultarLightbox(){
+        status = false;
+          fundo.style.display="none";
+          caixa.style.display="none";
+          fechar.style.display="none";
+      }  
+
     </script>
+  
   </body>
+  
   <script
       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBJtvVr9mV3pmMfcw3rnC8xQpPsiNqNS2M&callback=initMap" async defer>
   </script>
+
 </html>
