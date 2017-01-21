@@ -18,18 +18,20 @@
 
       <h3 id="cidadePopulacao"> </h3> 
       <div class="col"> 
-        <h3><b> Possue Água Encanada </b></h3>
-        <div id="atendimentoAgua"></div> 
+        <h3><b> Possui Água Encanada </b></h3>
+        <div id="atendimentoAgua" class="chart"></div>
       </div>
       
       <div class="col"> 
-        <h3><b> Possue Coleta de Lixo </b></h3> 
-        <div id="coletaEsgoto"></div>
+        <h3><b> Possui Coleta de Esgoto</b></h3>
+        <div id="coletaEsgoto" class="chart">
+          <h2 class="is-hidden"><b>Não possui coleta de esgoto ou informação não fornecida</b></h2>
+        </div>
       </div>
       
       <div class="col"> 
         <h3><b> Tratamento de Esgoto </b></h3>
-        <div id="tratamentoEsgoto"></div>
+        <div id="tratamentoEsgoto" class="chart"></div>
       </div>
 
       <div class="limpar"> </div>
@@ -41,9 +43,10 @@
     <div id="fundo" class="is-hidden"></div>
     
     <div id="map" ></div>
-    
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script>
       //&callback=initMap
+      google.charts.load('current', {'packages':['corechart']});
       var xhttp = new XMLHttpRequest();
       var jsonHttp = new XMLHttpRequest();
       var jsonCidades;
@@ -59,11 +62,11 @@
       var triangleCoords = [];
       var triangleCoords_bk = [];
       var geocoder;
+      var chartAgua, chartEsgoto, chartTratamento;//Variáveis dos gráficos
       //inicia as variáveis do google
       function initMap() {
           map = new google.maps.Map(document.getElementById('map'), {
             zoom: 7,
-            //center: new google.maps.LatLng(-3.7676522562832417,-38.525962829589844),
             center: new google.maps.LatLng(-5.2296382,-39.495452,7),
             mapTypeId: 'terrain'
           });
@@ -143,35 +146,6 @@
           triangleCoords=[];
           finished=true;
       }
-
-        /** @this {google.maps.Polygon} */
-      function showArrays(event) {
-          // Since this polygon has only one path, we can call getPath() to return the
-          // MVCArray of LatLngs.
-          var vertices = this.getPath();
-          var latlng = {lat: event.latLng.lat(), lng: event.latLng.lng()};
-          var contentString;
-            geocoder.geocode({'location': latlng}, function(results, status) {
-                if (status === google.maps.GeocoderStatus.OK) {
-                    if (results[1]) {
-                        console.log(results[5].formatted_address);
-                        contentString = '<b>'+results[6].formatted_address+'</b><br>' +
-                            'Clicked location: <br>' + event.latLng.lat() + ',' + event.latLng.lng() +
-                            '<br>';
-
-                        // Replace the info window's content and position.
-                        infoWindow.setContent(contentString);
-                        infoWindow.setPosition(event.latLng);
-
-                        infoWindow.open(map);
-                    } else {
-                        window.alert('No results found');
-                    }
-                } else {
-                    window.alert('Geocoder failed due to: ' + status);
-                }
-            });
-      }
       
       var status = false;
       var fundo = document.getElementById('fundo');
@@ -208,6 +182,9 @@
         var nome = cidade.nome;
         var idh = cidade.idh;
         var populacao = cidade.populacao;
+        var atendimentoAgua = cidade.atendimentoAgua;
+        var coletaEsgoto = cidade.coletaEsgoto;
+        var tratamentoEsgoto = cidade.tratamentoEsgoto;
         var investimentoT = cidade.investimentoTotalPorAno;
         var investimentoI = investimentoT/populacao;
         investimentoI = investimentoI.toFixed(1);
@@ -231,16 +208,18 @@
         }
         
         if(investimentoT != null){
-          document.getElementById('cidadeInvestimentoTotal').innerText = "Investimento Total Anual: R$"+investimentoT;
+          document.getElementById('cidadeInvestimentoTotal').innerText = "Investimento Total Anual: R$ "+investimentoT.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
         }else{          
           document.getElementById('cidadeInvestimentoTotal').innerText = "Investimento Total Anual: Informação não encontrado";
         }
 
         if(investimentoT!=null){
-          document.getElementById('cidadeInvestimentoIndiv').innerText = "Investimento Por Indivíduo (Anual): R$"+investimentoI;
+          document.getElementById('cidadeInvestimentoIndiv').innerText = "Investimento Por Indivíduo (Anual): R$ "+investimentoI;
         }else{          
           document.getElementById('cidadeInvestimentoIndiv').innerText = "Investimento Por Indivíduo (Anual): Informação não encontrado";
         }
+
+        drawChart(atendimentoAgua, coletaEsgoto, tratamentoEsgoto);
       }
 
       //mostra a caixa e a preenche com conteudo do município
@@ -276,11 +255,56 @@
           }
         })();
       }
+
+      function drawChart(agua, esgoto, tratamento) {
+          var options = {
+          };
+
+          if(agua != null && agua>0){
+              var aguaData = google.visualization.arrayToDataTable([
+                  ['Água Encanada', '%'],
+                  ['Possui', agua*100],
+                  ['Não possui', (1-agua)*100]
+              ]);
+
+              chartAgua  = new google.visualization.PieChart(document.getElementById('atendimentoAgua'));
+              chartAgua.draw(aguaData, options);
+          }
+          else {
+              chartAgua.clearChart();
+          }
+
+          if(esgoto != null && esgoto>0){
+              var esgotoData = google.visualization.arrayToDataTable([
+                  ['Coleta de Esgoto', '%'],
+                  ['Possui', esgoto*100],
+                  ['Não Possui', (1-esgoto)*100]
+              ]);
+
+              chartEsgoto = new google.visualization.PieChart(document.getElementById('coletaEsgoto'));
+              chartEsgoto.draw(esgotoData, options);
+          }
+          else {
+              chartEsgoto.clearChart();
+          }
+
+          if(tratamento != null && tratamento>0){
+              var tratamentoData = google.visualization.arrayToDataTable([
+                  ['Tratamento de Esgoto', '%'],
+                  ['Qtd. tratada', tratamento*100],
+                  ['Qtd. não tratada', (1-tratamento)*100]
+              ]);
+
+              chartTratamento = new google.visualization.PieChart(document.getElementById('tratamentoEsgoto'));
+              chartTratamento.draw(tratamentoData, options);
+          }
+          else {
+              chartTratamento.clearChart();
+          }
+      }
     </script>
   </body>
-  
   <script
       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBJtvVr9mV3pmMfcw3rnC8xQpPsiNqNS2M&callback=initMap" async defer>
   </script>
-
 </html>

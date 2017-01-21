@@ -66,6 +66,10 @@ h3{ font-size: 20px; font-weight: normal; }
 .limpar{clear:both;}
 .is-hidden {display: none;}
 
+.chart{
+  width: 100%;
+  height: auto;
+}
 #atendimentoAgua{ }
 #coletaEsgoto{ }
 #tratamentoEsgoto{ }
