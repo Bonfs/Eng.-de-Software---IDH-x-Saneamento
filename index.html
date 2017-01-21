@@ -69,19 +69,21 @@
 
       h3{ font-size: 20px; font-weight: normal; }
 
-      #atendimentoAgua{ }
-      #coletaEsgoto{ }
-      #tratamentoEsgoto{ }
       .col{
         float: left;
         width: 32%;
-        height: 350px;
-        background-color: red;
+        height: 300px;
+        //background-color: red;
         margin-right: 1.33%;
         margin-top: 10px;
         margin-bottom: 10px;
       }
+
       .limpar{clear:both;}
+
+      #atendimentoAgua{ }
+      #coletaEsgoto{ }
+      #tratamentoEsgoto{ }
 }
 
 
@@ -92,35 +94,35 @@
     <div id="fechar" onclick="ocultarLightbox()"><img src="fechar(1).png" alt="fechar caixa"></div>
     <div id="caixaDeDialogo">  
       <ul> 
-        <li> <h1>Fortaleza</h1> </li> 
-        <li> <h2>IDH: 0.754</h2> </li> 
+        <li> <h1 id="cidadeNome"> </h1> </li> 
+        <li> <h2 id="cidadeIDH"> </h2> </li> 
       </ul>
 
-      <h3>População: 2452185</h3> 
+      <h3 id="cidadePopulacao"> </h3> 
       <div class="col"> 
-        <h3> Possue Água Encanada </h3>
+        <h3><b> Possue Água Encanada </b></h3>
         <div id="atendimentoAgua"></div> 
       </div>
       
       <div class="col"> 
-        <h3> Possue Coleta </h3> 
+        <h3><b> Possue Coleta de Lixo </b></h3> 
         <div id="coletaEsgoto"></div>
       </div>
       
       <div class="col"> 
-        <h3> Tratamento de Esgoto </h3>
+        <h3><b> Tratamento de Esgoto </b></h3>
         <div id="tratamentoEsgoto"></div>
       </div>
 
       <div class="limpar"> </div>
 
-      <h3>Investimento Total Anual: 176228032</h3>
-      <h3>Investimento por Individuo Anual: 71,8</h3>
+      <h3 id="cidadeInvestimentoTotal"> </h3>
+      <h3 id="cidadeInvestimentoIndiv"> </h3>
 
     </div>
 
     <div id="fundo" onclick="ocultarLightbox()"></div>
-    <div id="map" onclick="mostrarLightbox()"></div>
+    <div id="map" ></div>
     
     <script>
       //&callback=initMap
@@ -218,18 +220,18 @@
               cearaMap.addListener('click', function(event) {
               // Since this polygon has only one path, we can call getPath() to return the
               // MVCArray of LatLngs.
-              mostrarLightbox();
-              var vertices = this.getPath();
-              var latlng = {lat: event.latLng.lat(), lng: event.latLng.lng()};
-              var contentString;
-              contentString = '<b>'+cidade.nome+'</b><br>' +
+              mostrarLightbox(cidade);
+              //var vertices = this.getPath();
+              //var latlng = {lat: event.latLng.lat(), lng: event.latLng.lng()};
+              //var contentString;
+              //contentString = '<b>'+cidade.nome+'</b><br>' +
                                 'Clicked location: <br>' + event.latLng.lat() + ',' + event.latLng.lng() +
                                 '<br>';
             // Replace the info window's content and position.
-            infoWindow.setContent(contentString);
-            infoWindow.setPosition(event.latLng);
+            //infoWindow.setContent(contentString);
+            //infoWindow.setPosition(event.latLng);
 
-            infoWindow.open(map);
+            //infoWindow.open(map);
            });//ate aqui
 
               infoWindow = new google.maps.InfoWindow;
@@ -270,13 +272,14 @@
       var fundo = document.getElementById('fundo');
       var caixa = document.getElementById('caixaDeDialogo');
       var fechar = document.getElementById('fechar');
-      function mostrarLightbox(){
+      function mostrarLightbox(cidade){
         status = true;
         if(status){
           fundo.style.display="block";
           caixa.style.display="block";
           fechar.style.display="block";
         }
+        preencherCaixa(cidade);
       }
 
       function ocultarLightbox(){
@@ -284,6 +287,45 @@
           fundo.style.display="none";
           caixa.style.display="none";
           fechar.style.display="none";
+      }
+
+      function preencherCaixa(cidade){
+        var nome = cidade.nome;
+        var idh = cidade.idh;
+        var populacao = cidade.populacao;
+        var investimentoT = cidade.investimentoTotalPorAno;
+        var investimentoI = investimentoT/populacao;
+        investimentoI = investimentoI.toFixed(1);
+
+        if(nome != null){
+          document.getElementById('cidadeNome').innerText = nome;
+        }else{
+          document.getElementById('cidadeNome').innerText = "Informação não encontrado";
+        }
+
+        if(idh != null){
+          document.getElementById('cidadeIDH').innerText = "IDH: "+idh;
+        }else{
+          document.getElementById('cidadeIDH').innerText = "IDH: Informação não encontrado";
+        }
+
+        if(populacao != null){
+          document.getElementById('cidadePopulacao').innerText = "População: "+populacao;
+        }else{
+          document.getElementById('cidadePopulacao').innerText = "População: Informação não encontrado";
+        }
+        
+        if(investimentoT != null){
+          document.getElementById('cidadeInvestimentoTotal').innerText = "Investimento Total Anual: R$"+investimentoT;
+        }else{          
+          document.getElementById('cidadeInvestimentoTotal').innerText = "Investimento Total Anual: Informação não encontrado";
+        }
+
+        if(investimentoT!=null){
+          document.getElementById('cidadeInvestimentoIndiv').innerText = "Investimento Por Indivíduo (Anual): R$"+investimentoI;
+        }else{          
+          document.getElementById('cidadeInvestimentoIndiv').innerText = "Investimento Por Indivíduo (Anual): Informação não encontrado";
+        }
       }  
     </script>
   </body>
