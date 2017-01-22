@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <link rel="stylesheet" type="text/css" href="css/estilo.css">
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <title>Polygon Arrays</title>
+    <title>Dados Municipios - Ceará</title>
   </head>
   <body>
     <div id="fechar" class="is-hidden"><img src="fechar(1).png" alt="fechar caixa"></div>
@@ -18,19 +18,19 @@
 
       <h3 id="cidadePopulacao"> </h3> 
       <div class="col"> 
-        <h3><b> Possui Água Encanada </b></h3>
+        <h3 class="centralizar"><b> Possui Água Encanada </b></h3>
         <div id="atendimentoAgua" class="chart"></div>
       </div>
       
       <div class="col"> 
-        <h3><b> Possui Coleta de Esgoto</b></h3>
+        <h3 class="centralizar"><b> Possui Coleta de Lixo</b></h3>
         <div id="coletaEsgoto" class="chart">
           <h2 class="is-hidden"><b>Não possui coleta de esgoto ou informação não fornecida</b></h2>
         </div>
       </div>
       
       <div class="col"> 
-        <h3><b> Tratamento de Esgoto </b></h3>
+        <h3 class="centralizar"><b> Tratamento de Esgoto </b></h3>
         <div id="tratamentoEsgoto" class="chart"></div>
       </div>
 
@@ -42,6 +42,21 @@
 
     <div id="fundo" class="is-hidden"></div>
     
+    <div id="info"></div>
+
+    <div id="caixaInfo" class="is-hidden">
+    	<h1 class="centralizar">IDH e Saneamento Básico</h1>
+
+    	<h3 style="text-align: justify; margin-top: 15px;">O projeto pretende mostrar a relação entre o IDH e o índice de saneamento básico dos municípios do Ceará, utilizando o mapa do estado como forma de navegação pelos municípios. O índice de saneamento básico foi descrito como: número de casas com água encanada, tratamento de esgoto e coleta de lixo. O projeto foi desenvolvido para a disciplina de Engenharia de software.</h3>
+	    	
+    	<ul>
+    		<li><a href="http://www.ufc.br/"> <img src="ufc.png" alt="Logo da Universidade Federal do Ceará"> </a></li>
+    		<li><a href="http://smd.virtual.ufc.br/"> <img src="smd.png" alt="Logo Sistemas e Midias Digitais"> </a></li>
+    	</ul>	
+    </div>
+
+    <div id="fundoInfo" class="is-hidden"></div>
+
     <div id="map" ></div>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script>
@@ -149,111 +164,135 @@
       
       var status = false;
       var fundo = document.getElementById('fundo');
+      var fundo_info = document.getElementById('fundoInfo');
       var caixa = document.getElementById('caixaDeDialogo');
       var fechar = document.getElementById('fechar');
+      var info = document.getElementById('info');
+      var caixaInfo = document.getElementById('caixaInfo');
 
       //esconder o lightbox
       fechar.addEventListener('click', function (){ switchLightbox(); });
       fundo.addEventListener('click', function (){ switchLightbox(); });
+      
+      //mostrar e esconder o informações
+      info.addEventListener('click', function (){ switchInfo(); });
+      fundo_info.addEventListener('click', function (){ switchInfo(); });
+
+      //mostrar e esconder o informações
+      function switchInfo(){
+		  	if(fundo_info.classList.contains('is-hidden')){
+		      fadeIn(fundo_info);
+		      info.style.backgroundImage = "url('fechar(1).png')";
+		    }else {
+		      fadeOut(fundo_info);
+		      info.style.backgroundImage = "url('info.png')";
+		    }
+
+		    if(caixaInfo.classList.contains('is-hidden')){
+		      fadeIn(caixaInfo);
+		    }else {
+		      fadeOut(caixaInfo);
+		    }
+      }
 
       //mostra ou esconde o lightbox 
       function switchLightbox(){
-        if(fundo.classList.contains('is-hidden')){
-          fadeIn(fundo);
-        }else {
-          fadeOut(fundo);
-        }
+	        if(fundo.classList.contains('is-hidden')){
+	          fadeIn(fundo);
+	        }else {
+	          fadeOut(fundo);
+	        }
 
-        if(caixa.classList.contains('is-hidden')){
-          fadeIn(caixa);
-        }else {
-          fadeOut(caixa);
-        }
+	        if(caixa.classList.contains('is-hidden')){
+	          fadeIn(caixa);
+	        }else {
+	          fadeOut(caixa);
+	        }
 
-        if(fechar.classList.contains('is-hidden')){
-          fadeIn(fechar); 
-        }else {
-          fadeOut(fechar);
-        }
+	        if(fechar.classList.contains('is-hidden')){
+	          fadeIn(fechar); 
+	        }else {
+	          fadeOut(fechar);
+	        }
       }
       
       //preenche o lightbox com conteudo do município
       function preencherCaixa(cidade){
-        var nome = cidade.nome;
-        var idh = cidade.idh;
-        var populacao = cidade.populacao;
-        var atendimentoAgua = cidade.atendimentoAgua;
-        var coletaEsgoto = cidade.coletaEsgoto;
-        var tratamentoEsgoto = cidade.tratamentoEsgoto;
-        var investimentoT = cidade.investimentoTotalPorAno;
-        var investimentoI = investimentoT/populacao;
-        investimentoI = investimentoI.toFixed(1);
+	        var nome = cidade.nome;
+	        var idh = cidade.idh;
+	        var populacao = cidade.populacao;
+	        var atendimentoAgua = cidade.atendimentoAgua;
+	        var coletaEsgoto = cidade.coletaEsgoto;
+	        var tratamentoEsgoto = cidade.tratamentoEsgoto;
+	        var investimentoT = cidade.investimentoTotalPorAno;
+	        var investimentoI = investimentoT/populacao;
+	        investimentoI = investimentoI.toFixed(1);
 
-        if(nome != null){
-          document.getElementById('cidadeNome').innerText = nome;
-        }else{
-          document.getElementById('cidadeNome').innerText = "Informação não encontrado";
-        }
+	        if(nome != null){
+	          document.getElementById('cidadeNome').innerText = nome;
+	        }else{
+	          document.getElementById('cidadeNome').innerText = "Informação não encontrado";
+	        }
 
-        if(idh != null){
-          document.getElementById('cidadeIDH').innerText = "IDH: "+idh;
-        }else{
-          document.getElementById('cidadeIDH').innerText = "IDH: Informação não encontrado";
-        }
+	        if(idh != null){
+	          document.getElementById('cidadeIDH').innerText = "IDH: "+idh;
+	        }else{
+	          document.getElementById('cidadeIDH').innerText = "IDH: Informação não encontrado";
+	        }
 
-        if(populacao != null){
-          document.getElementById('cidadePopulacao').innerText = "População: "+populacao;
-        }else{
-          document.getElementById('cidadePopulacao').innerText = "População: Informação não encontrado";
-        }
-        
-        if(investimentoT != null){
-          document.getElementById('cidadeInvestimentoTotal').innerText = "Investimento Total Anual: R$ "+investimentoT.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
-        }else{          
-          document.getElementById('cidadeInvestimentoTotal').innerText = "Investimento Total Anual: Informação não encontrado";
-        }
+	        if(populacao != null){
+	          document.getElementById('cidadePopulacao').innerText = "População: "+populacao;
+	        }else{
+	          document.getElementById('cidadePopulacao').innerText = "População: Informação não encontrado";
+	        }
+	        
+	        if(investimentoT != null){
+	          document.getElementById('cidadeInvestimentoTotal').innerText = "Investimento Total Anual: R$ "+investimentoT.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
+	        }else{          
+	          document.getElementById('cidadeInvestimentoTotal').innerText = "Investimento Total Anual: Informação não encontrado";
+	        }
 
-        if(investimentoT!=null){
-          document.getElementById('cidadeInvestimentoIndiv').innerText = "Investimento Por Indivíduo (Anual): R$ "+investimentoI;
-        }else{          
-          document.getElementById('cidadeInvestimentoIndiv').innerText = "Investimento Por Indivíduo (Anual): Informação não encontrado";
-        }
+	        if(investimentoT!=null){
+	          document.getElementById('cidadeInvestimentoIndiv').innerText = "Investimento Por Indivíduo (Anual): R$ "+investimentoI;
+	        }else{          
+	          document.getElementById('cidadeInvestimentoIndiv').innerText = "Investimento Por Indivíduo (Anual): Informação não encontrado";
+	        }
 
-        drawChart(atendimentoAgua, coletaEsgoto, tratamentoEsgoto);
+	        drawChart(atendimentoAgua, coletaEsgoto, tratamentoEsgoto);
       }
 
       //mostra a caixa e a preenche com conteudo do município
       function mostrarLightbox(cidade){       
-        switchLightbox();
-        preencherCaixa(cidade);
+	        switchLightbox();
+	        preencherCaixa(cidade);
       }
       
       function fadeOut(el){
-        el.style.opacity = 1;
-        (function fade() {
-          if ((el.style.opacity -= .1) < 0) {
-            el.style.display = 'none';
-            el.classList.add('is-hidden');
-          } else {
-            requestAnimationFrame(fade);
-          }
-        })();
+		    el.style.opacity = 1;
+		    (function fade() {
+		      if ((el.style.opacity -= .1) < 0) {
+		        el.style.display = 'none';
+		        el.classList.add('is-hidden');
+		      } else {
+		        requestAnimationFrame(fade);
+		      }
+		    })();
       }
 
       function fadeIn(el, display){
-        if (el.classList.contains('is-hidden')){
-          el.classList.remove('is-hidden');
-        }
-        el.style.opacity = 0;
-        el.style.display = display || "block";
+	        if (el.classList.contains('is-hidden')){
+	          el.classList.remove('is-hidden');
+	        }
+	        el.style.opacity = 0;
+	        el.style.display = display || "block";
 
-        (function fade() {
-          var val = parseFloat(el.style.opacity);
-          if (!((val += .1) > 1)) {
-            el.style.opacity = val;
-            requestAnimationFrame(fade);
-          }
-        })();
+	        (function fade() {
+	          var val = parseFloat(el.style.opacity);
+	          if (!((val += .1) > 1)) {
+	            el.style.opacity = val;
+	            requestAnimationFrame(fade);
+	          }
+	        })();
       }
 
       function drawChart(agua, esgoto, tratamento) {
@@ -261,6 +300,7 @@
           };
 
           if(agua != null && agua>0){
+          		document.getElementById('atendimentoAgua').innerHTML = "";
               var aguaData = google.visualization.arrayToDataTable([
                   ['Água Encanada', '%'],
                   ['Possui', agua*100],
@@ -272,9 +312,11 @@
           }
           else {
               chartAgua.clearChart();
+              document.getElementById('atendimentoAgua').innerHTML = "<h3 class='centralizar'>Informação não encontrada</h3>";
           }
 
           if(esgoto != null && esgoto>0){
+          		document.getElementById('coletaEsgoto').innerHTML = "";
               var esgotoData = google.visualization.arrayToDataTable([
                   ['Coleta de Esgoto', '%'],
                   ['Possui', esgoto*100],
@@ -286,9 +328,11 @@
           }
           else {
               chartEsgoto.clearChart();
+              document.getElementById('coletaEsgoto').innerHTML = "<h3 class='centralizar'>Informação não encontrada</h3>";
           }
 
           if(tratamento != null && tratamento>0){
+          		document.getElementById('tratamentoEsgoto').innerHTML = "";
               var tratamentoData = google.visualization.arrayToDataTable([
                   ['Tratamento de Esgoto', '%'],
                   ['Qtd. tratada', tratamento*100],
@@ -300,6 +344,7 @@
           }
           else {
               chartTratamento.clearChart();
+              document.getElementById('tratamentoEsgoto').innerHTML = "<h3 class='centralizar'>Informação não encontrada</h3>";
           }
       }
     </script>

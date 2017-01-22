@@ -14,33 +14,33 @@ h3{ font-size: 20px; font-weight: normal; }
   position: absolute;
   width: 100%;
   height: 100%;
-  z-index: 10;
+  z-index: 0;
   overflow:hidden;
 }
 
-#fundo {
+#fundo, #fundoInfo {
   position: absolute;
   width: 100%;
   height: 100%;
   background-color: rgba(0,0,0,.6);
   z-index: 20;
   overflow:hidden;
-}
+}#fundoInfo { z-index: 10; }
 
 #fechar{ 
-  width:24px; 
+  width:40px; 
   position: absolute;
-  top: calc(14% - 20px);
+  top: calc(15.5% - 20px);
   left: calc(86% - 10px);
   z-index: 35;
-}
+}#fechar img{ width: 100%; }
 
 #caixaDeDialogo{
   position: absolute;
   width: 70%;
-  height: 70%;
+  height: 65%;
   left: calc(15% - 20px); 
-  top: calc(15% - 20px);
+  top: calc(17.5% - 20px);
   padding: 20px;
   border-radius: 15px;
   background-color: #ffffff;
@@ -56,8 +56,7 @@ h3{ font-size: 20px; font-weight: normal; }
 .col{
   float: left;
   width: 32%;
-  height: 300px;
-  //background-color: red;
+  height: 260px;
   margin-right: 1.33%;
   margin-top: 10px;
   margin-bottom: 10px;
@@ -65,11 +64,45 @@ h3{ font-size: 20px; font-weight: normal; }
 
 .limpar{clear:both;}
 .is-hidden {display: none;}
+.centralizar{ text-align: center; }
+.chart{ width: 100%; height: auto; }
 
-.chart{
-  width: 100%;
-  height: auto;
+#info{
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  left: calc(100% - 48px - 20px);
+  top: 20px;
+  background-image: url('../info.png');
+  background-size: 100%;
+  cursor: pointer;
+  z-index: 15; 
 }
-#atendimentoAgua{ }
-#coletaEsgoto{ }
-#tratamentoEsgoto{ }
+
+#caixaInfo{
+  position: absolute;
+  width: 47%;
+  min-width: 330px;
+  height: 46%;
+  left: calc(50% - 23.5% - 60px);
+  top: calc(50% - 23% - 40px);
+  padding: 20px 30px;
+  border-radius: 15px;
+  background-color: #ffffff;
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 15;
+}
+
+#caixaInfo ul{
+  width: calc(440px + 8%);
+  margin: 20px auto 0px;
+}
+
+#caixaInfo ul li{
+  display: inline-block;
+  width: 220px;
+  margin-right: 4%;
+}
+
+#caixaInfo ul li img{ width: 100%; }
